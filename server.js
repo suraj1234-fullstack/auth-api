@@ -154,7 +154,7 @@ app.get('/api/auth/google/callback',
 
 // --- Database Connection & Server Start ---
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/trendnova';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/trndnova';
 
 mongoose.connect(MONGO_URI)
     .then(() => {
