@@ -152,6 +152,53 @@ app.get('/api/auth/google/callback',
     }
 );
 
+// =========================================================================
+// --- NEW ADMIN ROUTES (ADDED FOR USER MANAGEMENT & ROLE UPDATES) ---
+// =========================================================================
+
+// A. Get All Users (Admin Panel ke Users list ke liye)
+app.get('/api/auth/users', async (req, res) => {
+    try {
+        const users = await User.find({}).select('-password');
+        res.json({ users });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// B. Update User Role (Make Admin / Demote to User)
+app.put('/api/auth/users/:id', async (req, res) => {
+    try {
+        const { role } = req.body;
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.id, 
+            { role }, 
+            { new: true }
+        ).select('-password');
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found!" });
+        }
+
+        res.json({ message: "User role updated successfully!", updatedUser });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// C. Delete User from Database
+app.delete('/api/auth/users/:id', async (req, res) => {
+    try {
+        const deletedUser = await User.findByIdAndDelete(req.params.id);
+        if (!deletedUser) {
+            return res.status(404).json({ message: "User not found!" });
+        }
+        res.json({ message: "User deleted successfully from database!" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // --- Database Connection & Server Start ---
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/trndnova';
